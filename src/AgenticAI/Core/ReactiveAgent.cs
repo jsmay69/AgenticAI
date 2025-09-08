@@ -42,7 +42,7 @@ Available tools are listed below as JSON with name, description, and schema."";
         _memory = memory;
         _options = options.Value;
         _log = log;
-    }";
+    }
 
     public async Task<AgentResult> RunAsync(AgentTask task, CancellationToken ct = default)
     {

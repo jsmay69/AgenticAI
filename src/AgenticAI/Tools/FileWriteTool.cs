@@ -16,9 +16,15 @@ public class FileWriteTool : ITool
     {
         var relative = Convert.ToString(args["relativePath"]) ?? "output.txt";
         var content = Convert.ToString(args["content"]) ?? "";
-        var full = Path.Combine(_workspace, relative);
+
+        var wsFull = Path.GetFullPath(_workspace);
+        var full = Path.GetFullPath(Path.Combine(wsFull, relative));
+        if (!full.StartsWith(wsFull, StringComparison.Ordinal))
+            return new { error = "path escapes workspace" };
+
         Directory.CreateDirectory(Path.GetDirectoryName(full)!);
         await File.WriteAllTextAsync(full, content, ct);
-        return new { path = relative, size = content.Length };
+        var rel = Path.GetRelativePath(wsFull, full);
+        return new { path = rel.Replace("\\", "/"), size = content.Length };
     }
 }
