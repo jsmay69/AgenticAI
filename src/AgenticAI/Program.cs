@@ -54,6 +54,7 @@ public class Program
                 services.AddSingleton<ToolRegistry>();
                 services.AddSingleton<ITool, TimeTool>();
                 services.AddSingleton<ITool, CalculatorTool>();
+                services.AddSingleton<ITool, WebSearchTool>();
                 services.AddSingleton<ITool, FileWriteTool>(sp =>
                 {
                     var ws = config.GetSection("Tools")["Workspace"] ?? "workspace";

@@ -12,7 +12,12 @@ public class CalculatorTool : ITool
     public Task<object?> ExecuteAsync(Dictionary<string, object?> args, ToolContext ctx, CancellationToken ct = default)
     {
         var expr = args.TryGetValue("expr", out var v) ? Convert.ToString(v) ?? "" : "";
-        if (string.IsNullOrWhiteSpace(expr)) return Task.FromResult<object?>(new { error = "expr is required" });
+        if (string.IsNullOrWhiteSpace(expr))
+            return Task.FromResult<object?>(new { error = "expr is required" });
+
+        // Allow only numbers, whitespace and basic arithmetic operators
+        if (!System.Text.RegularExpressions.Regex.IsMatch(expr, "^[0-9+\-*/().\\s]+$"))
+            return Task.FromResult<object?>(new { error = "invalid characters in expression" });
 
         try
         {

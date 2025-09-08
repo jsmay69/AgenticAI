@@ -1,11 +1,12 @@
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace AgenticAI.Memory;
 
 public class FileMemoryStore : IMemoryStore
 {
     private readonly string _dir;
-    private readonly ConcurrentDictionary<string, object> _locks = new();
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
 
     public FileMemoryStore(string dir)
     {
@@ -16,13 +17,17 @@ public class FileMemoryStore : IMemoryStore
     public async Task AppendAsync(string sessionId, string role, string content, CancellationToken ct = default)
     {
         var path = Path.Combine(_dir, $"{San(sessionId)}.log");
-        var gate = _locks.GetOrAdd(path, _ => new object());
+        var gate = _locks.GetOrAdd(path, _ => new SemaphoreSlim(1, 1));
         var line = $"{DateTimeOffset.UtcNow:o}\t{role}\t{content}\n";
-        lock (gate)
+        await gate.WaitAsync(ct);
+        try
         {
-            File.AppendAllText(path, line);
+            await File.AppendAllTextAsync(path, line, ct);
         }
-        await Task.CompletedTask;
+        finally
+        {
+            gate.Release();
+        }
     }
 
     public async IAsyncEnumerable<(string Role, string Content)> ReadAsync(string sessionId, int maxTurns = 20, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default)
