@@ -58,7 +58,15 @@ public class Program
                 services.AddSingleton<ToolRegistry>();
                 services.AddSingleton<ITool, TimeTool>();
                 services.AddSingleton<ITool, CalculatorTool>();
-                services.AddSingleton<ITool, WebSearchTool>();
+                var serpApiKey = Environment.GetEnvironmentVariable("SERPAPI_KEY");
+                if (!string.IsNullOrEmpty(serpApiKey))
+                {
+                    services.AddSingleton<ITool>(sp => new WebSearchTool(sp.GetRequiredService<IHttpClientFactory>(), serpApiKey));
+                }
+                else
+                {
+                    Console.WriteLine("SERPAPI_KEY not set. Web search tool disabled.");
+                }
                 services.AddSingleton<ITool, FileWriteTool>(sp =>
                 {
                     var ws = config.GetSection("Tools")["Workspace"] ?? "workspace";

@@ -10,12 +10,10 @@ public class WebSearchTool : ITool
     private readonly string _apiKey;
     private readonly string _baseUrl;
 
-    public WebSearchTool(IHttpClientFactory factory)
+    public WebSearchTool(IHttpClientFactory factory, string apiKey)
     {
         _http = factory.CreateClient();
-        // Example: using SerpAPI (https://serpapi.com/)
-        _apiKey = Environment.GetEnvironmentVariable("SERPAPI_KEY")
-                  ?? throw new InvalidOperationException("SERPAPI_KEY not set");
+        _apiKey = apiKey;
         _baseUrl = "https://serpapi.com/search";
     }
 
