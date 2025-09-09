@@ -14,7 +14,7 @@ public class WebSearchTool : ITool
     {
         _http = factory.CreateClient();
         // Example: using SerpAPI (https://serpapi.com/)
-        _apiKey = Environment.GetEnvironmentVariable("SERPAPI_KEY") 
+        _apiKey = Environment.GetEnvironmentVariable("SERPAPI_KEY")
                   ?? throw new InvalidOperationException("SERPAPI_KEY not set");
         _baseUrl = "https://serpapi.com/search";
     }
@@ -37,8 +37,26 @@ public class WebSearchTool : ITool
     public async Task<object?> ExecuteAsync(Dictionary<string, object?> args, ToolContext ctx, CancellationToken ct = default)
     {
         var query = Convert.ToString(args["query"]) ?? "";
-        var numResults = args.TryGetValue("numResults", out var n) ? Convert.ToInt32(n) : 3;
-
+        
+        var temp = args.TryGetValue("numResults", out var n) ? n : null;
+        if (temp != null)
+        {
+            if (temp is JsonElement je && je.ValueKind == JsonValueKind.Number && je.TryGetInt32(out var intVal))
+            {
+                if (intVal < 1 || intVal > 10) return new { error = "numResults must be between 1 and 10" };
+            }
+            else if (temp is int intVal2)
+            {
+                if (intVal2 < 1 || intVal2 > 10) return new { error = "numResults must be between 1 and 10" };
+            }
+            else
+            {
+                return new { error = "numResults must be an integer" };
+            }
+        }
+        var numResultsstring = Convert.ToString(temp);
+        var numResults = !string.IsNullOrWhiteSpace(numResultsstring) && int.TryParse(numResultsstring, out var parsed) ? parsed : 3;   
+       
         var url = $"{_baseUrl}?engine=google&q={Uri.EscapeDataString(query)}&num={numResults}&api_key={_apiKey}";
 
         using var resp = await _http.GetAsync(url, ct);

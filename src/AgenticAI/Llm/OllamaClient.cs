@@ -15,7 +15,7 @@ public class OllamaClient : ILLMClient
     {
         _http = factory.CreateClient();
         _baseUrl = config.GetSection("Ollama")["BaseUrl"] ?? "http://localhost:11434";
-        _model = config.GetSection("Agent")["Model"] ?? config.GetSection("Ollama")["Model"] ?? "llama3.1:8b-instruct-q8_0";
+        _model =  config.GetSection("Ollama")["Model"] ?? "llama3.1:8b-instruct-q8_0";
     }
 
     public Task<string> ModelNameAsync() => Task.FromResult(_model);

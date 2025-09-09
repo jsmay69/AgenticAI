@@ -24,16 +24,18 @@ public class ReactiveAgent : IAgent
     };
 
     private const string ToolCallInstruction = @"You can either ANSWER or CALL_TOOL.
-To call a tool, reply with ONLY a single JSON object:
+To call a tool, return only the following JSON format exactly, do not include <thinking>…</thinking>, hidden analysis, or reasoning tags of any kind:
+
 {
   ""decision"":""CALL_TOOL"",
   ""tool"": ""<tool_name>"",
   ""arguments"": { ...object per tool schema... }
 }
+
 To answer normally, reply with:
 { ""decision"":""ANSWER"", ""final"": ""<message>"" }
 No other text.
-Available tools are listed below as JSON with name, description, and schema."";
+Available tools are listed below as JSON with name, description, and schema.";
 
     public ReactiveAgent(ILLMClient llm, ToolRegistry tools, IMemoryStore memory, IOptions<AgentOptions> options, ILogger<ReactiveAgent> log)
     {

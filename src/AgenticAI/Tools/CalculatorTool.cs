@@ -16,7 +16,7 @@ public class CalculatorTool : ITool
             return Task.FromResult<object?>(new { error = "expr is required" });
 
         // Allow only numbers, whitespace and basic arithmetic operators
-        if (!System.Text.RegularExpressions.Regex.IsMatch(expr, "^[0-9+\-*/().\\s]+$"))
+        if (!System.Text.RegularExpressions.Regex.IsMatch(expr, "^[0-9\\s+\\-*/().]+$"))
             return Task.FromResult<object?>(new { error = "invalid characters in expression" });
 
         try

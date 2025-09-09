@@ -46,9 +46,13 @@ public class Program
                 {
                     services.AddSingleton<ILLMClient, OpenAIClient>();
                 }
-                else
+                else if(string.Equals(provider, "Ollama", StringComparison.OrdinalIgnoreCase))
                 {
                     services.AddSingleton<ILLMClient, OllamaClient>();
+                }
+                else
+                {
+                    services.AddSingleton<ILLMClient, GroqClient>();
                 }
 
                 services.AddSingleton<ToolRegistry>();
