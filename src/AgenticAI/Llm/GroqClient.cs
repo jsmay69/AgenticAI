@@ -17,7 +17,7 @@ public class GroqClient : ILLMClient
     public GroqClient(IHttpClientFactory factory, IConfiguration config)
     {
         _http = factory.CreateClient();
-        _apiKey = "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"; // Environment.GetEnvironmentVariable(config.GetSection("Groq")["ApiKey"] ?? "OPENAI_API_KEY") ?? "";
+        _apiKey = config.GetSection("Groq")["ApiKey"]??"";
         if (string.IsNullOrWhiteSpace(_apiKey))
             throw new InvalidOperationException("OPENAI_API_KEY environment variable not set.");
         _baseUrl = config.GetSection("Groq")["BaseUrl"] ?? "https://api.groq.com/openai/v1";
