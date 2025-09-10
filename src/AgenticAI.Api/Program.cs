@@ -56,6 +56,7 @@ services.AddSingleton<IAgent, ReactiveAgent>();
 
 services.AddControllers();
 services.AddEndpointsApiExplorer();
+
 services.AddSwaggerGen();
 
 var app = builder.Build();
