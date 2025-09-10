@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using AgenticAI.Core;
+using AgenticAI.Llm.Interfaces;
 using Microsoft.Extensions.Configuration;
 
 namespace AgenticAI.Llm;

@@ -1,7 +1,11 @@
 using AgenticAI.Core;
 using AgenticAI.Llm;
+using AgenticAI.Llm.DI;
+using AgenticAI.Llm.Interfaces;
 using AgenticAI.Memory;
 using AgenticAI.Tools;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,17 @@ var config = builder.Configuration;
 var services = builder.Services;
 
 services.Configure<AgentOptions>(config.GetSection("Agent"));
+
+// OpenTelemetry Console exporter
+services.AddOpenTelemetry()
+    .WithTracing(t => t
+        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("AgentAPI"))
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddConsoleExporter());
+
+// LLM DI
+services.AddLlm(config);
 
 var memoryType = config.GetSection("Memory")["Type"] ?? "File";
 if (string.Equals(memoryType, "File", StringComparison.OrdinalIgnoreCase))

@@ -5,7 +5,7 @@ using AgenticAI.Memory;
 using AgenticAI.Tools;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using AgenticAI.Llm;
+using AgenticAI.Llm.Interfaces;
 
 namespace AgenticAI.Core;
 

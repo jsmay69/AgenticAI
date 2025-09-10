@@ -1,6 +1,6 @@
 using AgenticAI.Core;
 
-namespace AgenticAI.Llm;
+namespace AgenticAI.Llm.Interfaces;
 
 public interface ILLMClient
 {
