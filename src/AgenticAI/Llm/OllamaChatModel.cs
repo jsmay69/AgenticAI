@@ -1,4 +1,5 @@
-﻿using AgenticAI.Llm.Interfaces;
+﻿using AgenticAI.Core;
+using AgenticAI.Llm.Interfaces;
 using AgenticAI.Llm.Models;
 using System;
 using System.Collections.Generic;
@@ -16,13 +17,13 @@ namespace AgenticAI.Llm
         public string Model { get; }
         public OllamaChatModel(HttpClient http, string model) { _http = http; Model = model; }
 
-        public async Task<ChatResult> CompleteAsync(string system, IEnumerable<(string role, string content)> msgs, CancellationToken ct = default)
+        public async Task<ChatResult> CompleteAsync(string system, IEnumerable<ChatTurn> history, CancellationToken ct = default)
         {
             // Prefer /api/chat with JSON mode for tool-friendly strict outputs
             var messages = new List<object> {
             new { role = "system", content = system }
         };
-            messages.AddRange(msgs.Select(m => new { m.role, m.content }));
+            messages.AddRange(history.Select(m => new { m.Role, m.Content }));
 
             var req = new
             {
@@ -46,7 +47,7 @@ namespace AgenticAI.Llm
             {
                 // Fallback: try /api/generate once (also JSON format) to recover from empty content
                 var prompt = string.Join("\n", new[] { $"[SYSTEM]\n{system}\n" }
-                    .Concat(msgs.Select(m2 => $"[{m2.role.ToUpper()}]\n{m2.content}\n")));
+                    .Concat(history.Select(m2 => $"[{m2.Role.ToUpper()}]\n{m2.Content}\n")));
                 var genReq = new { model = Model, prompt, stream = false, format = "json", options = new { temperature = 0, num_predict = 256 } };
                 using var res2 = await _http.PostAsJsonAsync("/api/generate", genReq, ct);
                 res2.EnsureSuccessStatusCode();

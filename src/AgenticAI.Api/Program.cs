@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 var services = builder.Services;
 
-services.Configure<AgentOptions>(config.GetSection("Agent"));
 
 // OpenTelemetry Console exporter
 services.AddOpenTelemetry()
@@ -38,24 +37,24 @@ else
 
 services.AddHttpClient();
 
-var provider = config.GetSection("Agent")["Provider"] ?? "Ollama";
-if (string.Equals(provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
-{
-    services.AddSingleton<ILLMClient, OpenAIClient>();
-}
-else if (string.Equals(provider, "Ollama", StringComparison.OrdinalIgnoreCase))
-{
-    services.AddSingleton<ILLMClient, OllamaClient>();
-}
-else
-{
-    services.AddSingleton<ILLMClient, GroqClient>();
-}
+//var provider = config.GetSection("Agent")["Provider"] ?? "Ollama";
+//if (string.Equals(provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
+//{
+//    services.AddSingleton<ILLMClient, OpenAIClient>();
+//}
+//else if (string.Equals(provider, "Ollama", StringComparison.OrdinalIgnoreCase))
+//{
+//    services.AddSingleton<ILLMClient, OllamaClient>();
+//}
+//else
+//{
+//    services.AddSingleton<ILLMClient, GroqClient>();
+//}
 
 services.AddSingleton<ToolRegistry>();
 services.AddSingleton<ITool, TimeTool>();
 services.AddSingleton<ITool, CalculatorTool>();
-var serpApiKey = Environment.GetEnvironmentVariable("SERPAPI_KEY");
+var serpApiKey = config.GetSection("WebSearch")["SerpApiKey"];
 if (!string.IsNullOrEmpty(serpApiKey))
 {
     services.AddSingleton<ITool>(sp => new WebSearchTool(sp.GetRequiredService<IHttpClientFactory>(), serpApiKey));

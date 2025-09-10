@@ -1,4 +1,5 @@
-﻿using AgenticAI.Llm.Models;
+﻿using AgenticAI.Core;
+using AgenticAI.Llm.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace AgenticAI.Llm.Interfaces
         string Provider { get; }
         string Model { get; }
         System.Threading.Tasks.Task<ChatResult> CompleteAsync(
-            string system, System.Collections.Generic.IEnumerable<(string role, string content)> msgs,
+            string system, IEnumerable<ChatTurn> history,
             System.Threading.CancellationToken ct = default);
     }
 }

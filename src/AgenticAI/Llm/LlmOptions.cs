@@ -2,7 +2,9 @@
 {
     public sealed record LlmOptions
     {
-        public string DefaultProvider { get; init; } = "OpenAI";
+        public int MaxSteps { get; set; } = 8;
+        public string SystemPrompt { get; set; } = "You are a tool-using assistant.";
+        public string DefaultProvider { get; init; } = "Groq";
         public OpenAIOptions OpenAI { get; init; } = new();
         public OllamaOptions Ollama { get; init; } = new();
         public GroqOptions Groq { get; init; } = new();

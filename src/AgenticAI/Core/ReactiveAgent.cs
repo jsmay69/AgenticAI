@@ -6,15 +6,16 @@ using AgenticAI.Tools;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AgenticAI.Llm.Interfaces;
+using AgenticAI.Llm;
 
 namespace AgenticAI.Core;
 
 public class ReactiveAgent : IAgent
 {
-    private readonly ILLMClient _llm;
+    private readonly IChatModel _llm;
     private readonly ToolRegistry _tools;
     private readonly IMemoryStore _memory;
-    private readonly AgentOptions _options;
+    private readonly LlmOptions _options;
     private readonly ILogger<ReactiveAgent> _log;
     private static readonly JsonSerializerOptions _json = new(JsonSerializerOptions.Default)
     {
@@ -37,7 +38,15 @@ To answer normally, reply with:
 No other text.
 Available tools are listed below as JSON with name, description, and schema.";
 
-    public ReactiveAgent(ILLMClient llm, ToolRegistry tools, IMemoryStore memory, IOptions<AgentOptions> options, ILogger<ReactiveAgent> log)
+    //public ReactiveAgent(ILLMClient llm, ToolRegistry tools, IMemoryStore memory, IOptions<AgentOptions> options, ILogger<ReactiveAgent> log)
+    //{
+    //    _llm = llm;
+    //    _tools = tools;
+    //    _memory = memory;
+    //    _options = options.Value;
+    //    _log = log;
+    //}
+    public ReactiveAgent(IChatModel llm, ToolRegistry tools, IMemoryStore memory, IOptions<LlmOptions> options, ILogger<ReactiveAgent> log)
     {
         _llm = llm;
         _tools = tools;
@@ -82,9 +91,11 @@ Available tools are listed below as JSON with name, description, and schema.";
 
             try
             {
-                using var doc = JsonDocument.Parse(modelOut);
-                var root = doc.RootElement;
-                var decision = root.GetProperty("decision").GetString();
+                //using var doc = JsonDocument.Parse(modelOut);
+                //var root = doc.RootElement;
+                //var decision = root.GetProperty("decision").GetString();
+                var root = JsonDocument.Parse(modelOut.Text).RootElement;
+                var decision = JsonDocument.Parse(modelOut.Text).RootElement.GetProperty("decision").GetString() ?? "";
                 if (string.Equals(decision, "ANSWER", StringComparison.OrdinalIgnoreCase))
                 {
                     final = root.GetProperty("final").GetString() ?? "";
@@ -112,7 +123,7 @@ Available tools are listed below as JSON with name, description, and schema.";
             catch (Exception ex)
             {
                 _log.LogWarning(ex, "Failed to parse or execute tool JSON. Falling back to plain answer.");
-                final = modelOut.Trim();
+                final = modelOut.Text.Trim();
                 break;
             }
         }
