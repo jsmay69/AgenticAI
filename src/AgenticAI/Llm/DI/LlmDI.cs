@@ -28,11 +28,11 @@ namespace AgenticAI.Llm.DI
                     c.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
             });
 
-            s.AddKeyedTransient<IChatModel>("OpenAI", sp =>
+            s.AddKeyedTransient<IChatModel>("OpenAI", (sp, _) =>
                 new OpenAIChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("OpenAI"), opts.OpenAI.Model));
-            s.AddKeyedTransient<IChatModel>("Ollama", sp =>
+            s.AddKeyedTransient<IChatModel>("Ollama", (sp, _) =>
                 new OllamaChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama"), opts.Ollama.Model));
-            s.AddKeyedTransient<IChatModel>("Groq", sp =>
+            s.AddKeyedTransient<IChatModel>("Groq", (sp, _) =>
                 new GroqChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("Groq"), opts.Groq.Model));
 
             s.AddSingleton<IChatModelSelector>(sp => new Selector(
