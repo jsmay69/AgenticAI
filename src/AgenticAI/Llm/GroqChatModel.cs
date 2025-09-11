@@ -30,7 +30,12 @@ namespace AgenticAI.Llm
             if (!string.IsNullOrWhiteSpace(system))
                 messages.Add(new() { ["role"] = "system", ["content"] = system });
             foreach (var h in history)
-                messages.Add(new() { ["role"] = h.Role, ["content"] = h.Content });
+            {
+                var role = h.Role;
+                if (string.Equals(role, "tool", StringComparison.OrdinalIgnoreCase))
+                    role = "user";
+                messages.Add(new() { ["role"] = role, ["content"] = h.Content });
+            }
 
             var payload = new
             {
