@@ -1,16 +1,17 @@
 ﻿using AgenticAI.Llm.Interfaces;
+using AgenticAI.Llm.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AgenticAI.Llm.DI
 {
-
     public static class LlmDI
     {
         public static IServiceCollection AddLlm(this IServiceCollection serviceCollection, IConfiguration config)
         {
             var opts = new LlmOptions(); config.GetSection("LLM").Bind(opts);
-            serviceCollection.AddSingleton(opts);
+
+            serviceCollection.AddSingleton(opts); serviceCollection.AddHttpClient("Ollama", c => c.BaseAddress = new Uri(opts.Ollama.Host));
 
             serviceCollection.AddHttpClient("OpenAI", c => {
                 c.BaseAddress = new Uri(opts.OpenAI.BaseUrl);
@@ -19,8 +20,7 @@ namespace AgenticAI.Llm.DI
                     c.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
             });
-            serviceCollection.AddHttpClient("Ollama", c => c.BaseAddress = new Uri(opts.Ollama.Host));
-
+            
             serviceCollection.AddHttpClient("Groq", c => {
                 c.BaseAddress = new Uri(opts.Groq.BaseUrl);
                 var key = ResolveKey(opts.Groq.ApiKey);
@@ -29,17 +29,23 @@ namespace AgenticAI.Llm.DI
             });
 
             serviceCollection.AddKeyedTransient<IChatModel>("OpenAI", (sp, _) =>
-                new OpenAIChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("OpenAI"), opts.OpenAI.Model));
+                new OpenAIChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("OpenAI"), opts.OpenAI));
             serviceCollection.AddKeyedTransient<IChatModel>("Ollama", (sp, _) =>
-                new OllamaChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama"), opts.Ollama.Model));
+                new OllamaChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama"), opts.Ollama));
             serviceCollection.AddKeyedTransient<IChatModel>("Groq", (sp, _) =>
-                new GroqChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("Groq"), opts.Groq.Model));
+                new GroqChatModel(sp.GetRequiredService<IHttpClientFactory>().CreateClient("Groq"), opts.Groq));
 
             serviceCollection.AddSingleton<IChatModelSelector>(sp => new Selector(
                 sp.GetRequiredKeyedService<IChatModel>("OpenAI"),
                 sp.GetRequiredKeyedService<IChatModel>("Ollama"),
                 sp.GetRequiredKeyedService<IChatModel>("Groq"),
                 Enum.Parse<LlmProvider>(opts.DefaultProvider, true)));
+
+            // Provide a default IChatModel based on the configured provider so consumers
+            // that depend directly on IChatModel (such as ReactiveAgent) can be
+            // resolved without requiring keyed lookups.
+            serviceCollection.AddTransient<IChatModel>(sp =>
+                sp.GetRequiredService<IChatModelSelector>().Select());
 
             return serviceCollection;
         }

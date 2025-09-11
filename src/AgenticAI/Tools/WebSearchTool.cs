@@ -1,6 +1,4 @@
 using System.Text.Json;
-using System.Linq;
-using AgenticAI.Core;
 
 namespace AgenticAI.Tools;
 

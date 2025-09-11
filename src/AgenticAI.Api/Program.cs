@@ -1,7 +1,5 @@
 using AgenticAI.Core;
-using AgenticAI.Llm;
 using AgenticAI.Llm.DI;
-using AgenticAI.Llm.Interfaces;
 using AgenticAI.Memory;
 using AgenticAI.Tools;
 using OpenTelemetry.Resources;
@@ -36,20 +34,6 @@ else
 }
 
 services.AddHttpClient();
-
-//var provider = config.GetSection("Agent")["Provider"] ?? "Ollama";
-//if (string.Equals(provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
-//{
-//    services.AddSingleton<ILLMClient, OpenAIClient>();
-//}
-//else if (string.Equals(provider, "Ollama", StringComparison.OrdinalIgnoreCase))
-//{
-//    services.AddSingleton<ILLMClient, OllamaClient>();
-//}
-//else
-//{
-//    services.AddSingleton<ILLMClient, GroqClient>();
-//}
 
 services.AddSingleton<ToolRegistry>();
 services.AddSingleton<ITool, TimeTool>();

@@ -1,4 +1,4 @@
-﻿namespace AgenticAI.Llm
+﻿namespace AgenticAI.Llm.Models
 {
     public sealed record LlmOptions
     {

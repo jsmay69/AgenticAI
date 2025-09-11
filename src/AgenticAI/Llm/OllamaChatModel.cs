@@ -1,31 +1,36 @@
 ﻿using AgenticAI.Core;
 using AgenticAI.Llm.Interfaces;
 using AgenticAI.Llm.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
+using static AgenticAI.Llm.Models.LlmOptions;
 
 namespace AgenticAI.Llm
 {
     public sealed class OllamaChatModel : IChatModel
     {
-        private readonly HttpClient _http;
+        private readonly HttpClient _http; 
+        private readonly OllamaOptions _options;
         public string Provider => "Ollama";
         public string Model { get; }
-        public OllamaChatModel(HttpClient http, string model) { _http = http; Model = model; }
+
+        
+        public OllamaChatModel(HttpClient http, OllamaOptions options) 
+        { 
+            _http = http; 
+            _options = options;  
+            Model = _options.Model; 
+        }
 
         public async Task<ChatResult> CompleteAsync(string system, IEnumerable<ChatTurn> history, CancellationToken ct = default)
         {
             // Prefer /api/chat with JSON mode for tool-friendly strict outputs
-            var messages = new List<object> {
-            new { role = "system", content = system }
-        };
+            var messages = new List<object> 
+            {
+                new { role = "system", content = system }
+            };
             messages.AddRange(history.Select(m => new { m.Role, m.Content }));
 
-            var req = new
+            var payload = new
             {
                 model = Model,
                 messages,
@@ -33,9 +38,9 @@ namespace AgenticAI.Llm
                 format = "json", // enforce valid JSON outputs
                 options = new { temperature = 0, num_predict = 256 }
             };
-
+            
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            using var res = await _http.PostAsJsonAsync("/api/chat", req, ct);
+            using var res = await _http.PostAsJsonAsync("chat/completions", payload, cancellationToken: ct);
             sw.Stop();
             res.EnsureSuccessStatusCode();
             var json = await res.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>(cancellationToken: ct);

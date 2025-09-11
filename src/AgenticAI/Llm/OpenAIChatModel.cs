@@ -1,22 +1,26 @@
 ﻿using AgenticAI.Core;
 using AgenticAI.Llm.Interfaces;
 using AgenticAI.Llm.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using static AgenticAI.Llm.Models.LlmOptions;
 
 namespace AgenticAI.Llm
 {
     public sealed class OpenAIChatModel : IChatModel
     {
         private readonly HttpClient _http;
+        private readonly OpenAIOptions _options;
+
         public string Provider => "OpenAI";
         public string Model { get; }
-        public OpenAIChatModel(HttpClient http, string model) { _http = http; Model = model; }
+        
+        public OpenAIChatModel(HttpClient http, OpenAIOptions options) 
+        { 
+            _http = http; 
+            _options = options;
+            Model = _options.Model; 
+        }
 
         public async Task<ChatResult> CompleteAsync(string system, IEnumerable<ChatTurn> history, CancellationToken ct = default)
         {
@@ -32,9 +36,11 @@ namespace AgenticAI.Llm
                 messages = messages,
                 temperature = 0.2
             };
+
             var sw = System.Diagnostics.Stopwatch.StartNew();
             using var res = await _http.PostAsJsonAsync("chat/completions", payload, ct);
             sw.Stop();
+
             res.EnsureSuccessStatusCode();
             var json = await res.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
 

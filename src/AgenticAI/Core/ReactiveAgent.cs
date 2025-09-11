@@ -6,7 +6,7 @@ using AgenticAI.Tools;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using AgenticAI.Llm.Interfaces;
-using AgenticAI.Llm;
+using AgenticAI.Llm.Models;
 
 namespace AgenticAI.Core;
 
@@ -38,14 +38,6 @@ To answer normally, reply with:
 No other text.
 Available tools are listed below as JSON with name, description, and schema.";
 
-    //public ReactiveAgent(ILLMClient llm, ToolRegistry tools, IMemoryStore memory, IOptions<AgentOptions> options, ILogger<ReactiveAgent> log)
-    //{
-    //    _llm = llm;
-    //    _tools = tools;
-    //    _memory = memory;
-    //    _options = options.Value;
-    //    _log = log;
-    //}
     public ReactiveAgent(IChatModel llm, ToolRegistry tools, IMemoryStore memory, IOptions<LlmOptions> options, ILogger<ReactiveAgent> log)
     {
         _llm = llm;
@@ -91,9 +83,6 @@ Available tools are listed below as JSON with name, description, and schema.";
 
             try
             {
-                //using var doc = JsonDocument.Parse(modelOut);
-                //var root = doc.RootElement;
-                //var decision = root.GetProperty("decision").GetString();
                 var root = JsonDocument.Parse(modelOut.Text).RootElement;
                 var decision = JsonDocument.Parse(modelOut.Text).RootElement.GetProperty("decision").GetString() ?? "";
                 if (string.Equals(decision, "ANSWER", StringComparison.OrdinalIgnoreCase))
