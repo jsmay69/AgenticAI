@@ -49,6 +49,7 @@ services.AddSingleton<ITool, FileWriteTool>(sp =>
     Directory.CreateDirectory(ws);
     return new FileWriteTool(ws);
 });
+services.AddSingleton<ITool, ChromaRagTool>();
 
 services.AddSingleton<IAgent, ReactiveAgent>();
 

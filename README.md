@@ -10,6 +10,7 @@ Production-ready agentic AI scaffold with pluggable LLMs (OpenAI, Ollama) and a 
   - `calculator`: evaluates a math expression
   - `file_write`: writes text to a file inside a sandboxed workspace
   - `web_search`: searches the web using [SerpAPI](https://serpapi.com/) (requires API key)
+  - `chroma_rag`: queries a Chroma database (via MCP) for retrieval-augmented generation
 - File-backed conversational memory
 - Configurable via `appsettings.json`
 - Console runner
@@ -19,6 +20,7 @@ Production-ready agentic AI scaffold with pluggable LLMs (OpenAI, Ollama) and a 
 - For **OpenAI**: set environment variable `OPENAI_API_KEY`
 - For **Ollama**: install Ollama, run `ollama serve`, pull a model like `ollama pull llama3.1:8b-instruct-q8_0`
 - For **WebSearchTool**: get a [SerpAPI key](https://serpapi.com/), set `SERPAPI_KEY` env var
+- For **ChromaRagTool**: ensure a Chroma MCP server is running and set `Chroma:McpUrl` in `appsettings.json`
 
 ## Quick start
 ```bash
