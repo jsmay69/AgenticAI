@@ -49,6 +49,12 @@ services.AddSingleton<ITool, FileWriteTool>(sp =>
     Directory.CreateDirectory(ws);
     return new FileWriteTool(ws);
 });
+services.AddSingleton<ITool, PdfDownloadTool>(sp =>
+{
+    var ws = config.GetSection("Tools")["Workspace"] ?? "workspace";
+    Directory.CreateDirectory(ws);
+    return new PdfDownloadTool(sp.GetRequiredService<IHttpClientFactory>(), ws);
+});
 services.AddSingleton<ITool, ChromaRagTool>();
 
 services.AddSingleton<IAgent, ReactiveAgent>();

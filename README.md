@@ -9,6 +9,7 @@ Production-ready agentic AI scaffold with pluggable LLMs (OpenAI, Ollama) and a 
   - `time_now`: returns current UTC and local time
   - `calculator`: evaluates a math expression
   - `file_write`: writes text to a file inside a sandboxed workspace
+  - `pdf_download`: downloads a PDF from a URL into the workspace
   - `web_search`: searches the web using [SerpAPI](https://serpapi.com/) (requires API key)
   - `chroma_rag`: queries a Chroma database (via MCP) for retrieval-augmented generation
 - File-backed conversational memory
